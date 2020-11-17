@@ -1,0 +1,18 @@
+STRINGTABLE Tposereader
+{
+	Tposereader "PoseReader";
+
+    SETTINGS_GROUP "Settings";
+
+    ORIGIN_OBJECT "Origin";
+    TARGET_OBJECT "Target";
+
+    SETTINGS_AXIS "Axis";
+    SETTINGS_AXIS_X "X";
+    SETTINGS_AXIS_Y "Y";
+    SETTINGS_AXIS_Z "Z";
+
+    RESULT_GROUP "Result";
+
+    RESULT_ROTATION "Rotation";
+}
