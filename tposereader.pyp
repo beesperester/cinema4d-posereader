@@ -110,7 +110,7 @@ class PoseReader(c4d.plugins.TagData):
 if __name__ == "__main__":
     # Retrieves the icon path
     directory, _ = os.path.split(__file__)
-    fn = os.path.join(directory, "res", "tposereader.tif")
+    fn = os.path.join(directory, "res", "tposereader.png")
 
     # Creates a BaseBitmap
     bmp = c4d.bitmaps.BaseBitmap()
