@@ -43,9 +43,27 @@ class PoseReader(c4d.plugins.TagData):
 
     @classmethod
     def CalculateVector(cls, originObject, targetObject, offset):
-        targetPosition = offset * targetObject.GetMg() * ~originObject.GetMg()
+        targetMatrix = targetObject.GetMg()
+        targetRotationMatrix = c4d.Matrix(
+            c4d.Vector(0, 0, 0),
+            targetMatrix.v1,
+            targetMatrix.v2,
+            targetMatrix.v3
+        )
 
-        return c4d.Vector(targetPosition - originObject.GetMg().off).GetNormalized()
+        originMatrix = originObject.GetMg()
+        originRotationMatrix = c4d.Matrix(
+            c4d.Vector(0, 0, 0),
+            originMatrix.v1,
+            originMatrix.v2,
+            originMatrix.v3
+        )
+
+        offsetMatrix = (~originRotationMatrix) * targetRotationMatrix
+
+        return offsetMatrix.MulV(offset.GetNormalized())
+
+        # return c4d.Vector(targetPosition - originObject.GetMg().off).GetNormalized()
     
     def Execute(self, tag, doc, op, bt, priority, flags):
         """
@@ -74,19 +92,19 @@ class PoseReader(c4d.plugins.TagData):
             try:
                 if axis == SETTINGS_AXIS_X:
                     # calculate rotation along x
-                    targetVectorX = PoseReader.CalculateVector(originObject, targetObject, c4d.Vector(0, 0, 100))
+                    targetVectorX = PoseReader.CalculateVector(originObject, targetObject, c4d.Vector(0, 0, 100.0))
 
                     self.rotation = CalculateRotation(targetVectorX.z, targetVectorX.y)
                 elif axis == SETTINGS_AXIS_Y:
                     # calculate rotation along y
-                    targetVectorY = PoseReader.CalculateVector(originObject, targetObject, c4d.Vector(100, 0, 0))
+                    targetVectorY = PoseReader.CalculateVector(originObject, targetObject, c4d.Vector(100.0, 0, 0))
 
                     self.rotation = CalculateRotation(targetVectorY.x, targetVectorY.z)
                 elif axis == SETTINGS_AXIS_Z:
                     # calculate rotation along z
-                    targetVectorZ = PoseReader.CalculateVector(originObject, targetObject, c4d.Vector(0, 100, 0))
+                    targetVectorZ = PoseReader.CalculateVector(originObject, targetObject, c4d.Vector(0, 100.0, 0))
 
-                    self.rotation = math.radians(90.0) - CalculateRotation(targetVectorZ.x, targetVectorZ.y)
+                    self.rotation = CalculateRotation(targetVectorZ.y, targetVectorZ.x)
             except ZeroDivisionError:
                 pass
 
