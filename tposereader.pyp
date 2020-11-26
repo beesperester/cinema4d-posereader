@@ -112,6 +112,64 @@ class PoseReader(c4d.plugins.TagData):
         
         return c4d.EXECUTIONRESULT_OK
 
+    def Draw(self, tag, op, bd, bh):
+        data = tag.GetDataInstance()
+        drawpass = bd.GetDrawPass()
+
+        originObject = data[ORIGIN_OBJECT]
+        axis = data[SETTINGS_AXIS]
+
+        originMatrix = originObject.GetMg()
+
+        position = originMatrix.off
+
+        if axis == SETTINGS_AXIS_X:
+            # aim axis side
+            up = c4d.Vector(0, 1.0, 0)
+            aim = c4d.Vector(1.0, 0, 0)
+            side = c4d.Vector(0, 0, 1.0)
+        elif axis == SETTINGS_AXIS_Y:
+            # aim axis up
+            up = c4d.Vector(0, 0, -1.0)
+            aim = c4d.Vector(0, 1.0, 0)
+            side = c4d.Vector(1.0, 0, 0)
+        elif axis == SETTINGS_AXIS_Z:
+            # aim axis forward
+            up = c4d.Vector(0, 1.0, 0)
+            aim = c4d.Vector(0, 0, 1.0)
+            side = c4d.Vector(1.0, 0, 0)
+
+        debugMatrix = c4d.Matrix(
+            position,
+            originMatrix.MulV(side),
+            originMatrix.MulV(up),
+            originMatrix.MulV(aim)
+        )
+
+        # debugMatrix = debugMatrix * originMatrix
+
+        scale = 10.0
+
+        baseLineTargetPosition = (side * scale) * originMatrix
+        bd.SetPen(c4d.GetViewColor(c4d.VIEWCOLOR_ZAXIS))
+        bd.DrawLine(position, baseLineTargetPosition, 0)
+
+        rotation = c4d.Quaternion()
+        rotation.SetAxis(aim, self.rotation)
+        rotationMatrix = rotation.GetMatrix()
+
+        rotationLineTargetPosition = (rotationMatrix.MulV(side) * scale) * originMatrix
+        bd.SetPen(c4d.GetViewColor(c4d.VIEWCOLOR_YAXIS))
+        bd.DrawLine(position, rotationLineTargetPosition, 0)
+
+        # draw circle
+        debugMatrix.Scale(scale)
+
+        bd.SetPen(c4d.GetViewColor(c4d.VIEWCOLOR_XAXIS))
+        bd.DrawCircle(debugMatrix)    
+
+        return True
+
     # def SetDParameter(self, node, id, t_data, flags):
     #     if not node:
     #         return
@@ -141,7 +199,7 @@ if __name__ == "__main__":
 
     c4d.plugins.RegisterTagPlugin(id=PLUGIN_ID,
         str="PoseReader",
-        info=c4d.TAG_EXPRESSION | c4d.TAG_VISIBLE,
+        info=c4d.TAG_EXPRESSION | c4d.TAG_VISIBLE | c4d.TAG_IMPLEMENTS_DRAW_FUNCTION,
         g=PoseReader,
         description="Tposereader",
         icon=bmp
