@@ -83,18 +83,9 @@ settings_axis = Description({
             axis_y,
             axis_z
         ])
-    ]
-})
-
-group_settings = Group("GROUP_SETTINGS", {
-    "value": [
-        crumb_flag_group_open,
-        settings_draw_debug_lines,
-        settings_origin_object,
-        settings_target_object
     ],
     "locales": {
-        "strings_us": "Settings"
+        "strings_us": "Read Axis"
     }
 })
 
@@ -104,7 +95,23 @@ result_rotation = Description({
     "value": [
         Assignment("ANIM", "OFF"),
         Assignment("UNIT", "DEGREE")
-    ]
+    ],
+    "locales": {
+        "strings_us": "Rotation"
+    }
+})
+
+group_settings = Group("GROUP_SETTINGS", {
+    "value": [
+        crumb_flag_group_open,
+        settings_draw_debug_lines,
+        settings_origin_object,
+        settings_target_object,
+        settings_axis
+    ],
+    "locales": {
+        "strings_us": "Settings"
+    }
 })
 
 group_result = Group("GROUP_RESULT", {
